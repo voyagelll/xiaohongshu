@@ -30,22 +30,25 @@ def get_products_list():
 
 
 def start_requests(i=1):
-	print('请输入商品名称：')
-	keyword = '笔记本'
-	rsp = requests.get(url.format(keyword, str(1)), headers=headers)
-	print(rsp)                         
-	if rsp.status_code == 200:
-		text = json.loads(rsp.text)
-		if (text.get('result')==0) and (text.get('success')) and (text.get('data').get('items')):
-			return	parse(text), keyword
-	else:
-		time.sleep(random.randint(2, 6) + random.random() * 5)
-		i += 1
-		if i < 4:
-			print('第%s次请求%s' % (i, url))
-			start_requests(i=i)
+	# print('请输入商品名称：')
+	# keyword = '笔记本'
+	products = get_products_list()
+	print(products)
+	for keyword in products:
+		rsp = requests.get(url.format(keyword, str(1)), headers=headers)
+		print(rsp)
+		if rsp.status_code == 200:
+			text = json.loads(rsp.text)
+			if (text.get('result')==0) and (text.get('success')) and (text.get('data').get('items')):
+				return	parse(text), keyword
 		else:
-			pass
+			time.sleep(random.randint(2, 6) + random.random() * 5)
+			i += 1
+			if i < 4:
+				print('第%s次请求%s' % (i, url))
+				start_requests(i=i)
+			else:
+				pass
 
 
 def parse(text):
@@ -142,7 +145,7 @@ def parse_page(text, keyword):
 			data['stock_shortage'] = item.get('stock_shortage')
 			print(data)
 			save_data(data)
-		time.sleep(random.randint(2, 6) + random.random() * 5)
+		time.sleep(random.randint(3, 6) + random.random() * 10)
 	else:
 		pass
 # else:
